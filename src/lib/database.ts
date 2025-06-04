@@ -1,14 +1,6 @@
 import { Sequelize } from 'sequelize';
 import pg from 'pg';
 
-
-console.log(process.env.DB_HOST);
-console.log(process.env.DB_PORT);
-console.log(process.env.DB_NAME);
-console.log(process.env.DB_USER);
-console.log(process.env.DB_PASSWORD);
-
-
 const sequelize = new Sequelize({
   dialect: 'postgres',
   dialectModule: pg,
@@ -22,6 +14,12 @@ const sequelize = new Sequelize({
     timestamps: true,
     underscored: true,
   },
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false, // Accept AWS's default SSL certificate
+    },
+  },
 });
 
-export default sequelize; 
+export default sequelize;
