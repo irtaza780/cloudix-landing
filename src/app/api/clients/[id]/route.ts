@@ -15,11 +15,12 @@ async function initDb() {
 // GET single client
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await initDb();
-    const client = await Client.findByPk(params.id);
+    const { id } = await params;
+    const client = await Client.findByPk(id);
 
     if (!client) {
       return NextResponse.json(
@@ -41,14 +42,15 @@ export async function GET(
 // PUT update client
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await initDb();
     const body = await request.json();
     const { name, email, company, phone, status } = body;
+    const { id } = await params;
 
-    const client = await Client.findByPk(params.id);
+    const client = await Client.findByPk(id);
 
     if (!client) {
       return NextResponse.json(
@@ -66,10 +68,10 @@ export async function PUT(
     });
 
     return NextResponse.json(client);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error updating client:', error);
 
-    if (error.name === 'SequelizeUniqueConstraintError') {
+    if (error && typeof error === 'object' && 'name' in error && error.name === 'SequelizeUniqueConstraintError') {
       return NextResponse.json(
         { error: 'Client with this email already exists' },
         { status: 409 }
@@ -86,11 +88,12 @@ export async function PUT(
 // DELETE client
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await initDb();
-    const client = await Client.findByPk(params.id);
+    const { id } = await params;
+    const client = await Client.findByPk(id);
 
     if (!client) {
       return NextResponse.json(

@@ -52,10 +52,10 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(client, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error creating client:', error);
     
-    if (error.name === 'SequelizeUniqueConstraintError') {
+    if (error && typeof error === 'object' && 'name' in error && error.name === 'SequelizeUniqueConstraintError') {
       return NextResponse.json(
         { error: 'Client with this email already exists' },
         { status: 409 }
